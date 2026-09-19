@@ -23,3 +23,20 @@ test('strips leading punctuation', () => {
 test('handles already-slugified input', () => {
   expect(slugify('already-a-slug')).toBe('already-a-slug')
 })
+
+// regression tests for issue #60
+test('strips trailing punctuation — exclamation mark', () => {
+  expect(slugify('Great Deal!')).toBe('great-deal')
+})
+test('strips trailing punctuation — question mark', () => {
+  expect(slugify('Wait... what?')).toBe('wait-what')
+})
+test('strips trailing punctuation — ellipsis', () => {
+  expect(slugify('Loading...')).toBe('loading')
+})
+test('strips trailing punctuation — multiple trailing symbols', () => {
+  expect(slugify('Buy now!!!')).toBe('buy-now')
+})
+test('strips both leading and trailing punctuation together', () => {
+  expect(slugify('---Hello World!--')).toBe('hello-world')
+})
