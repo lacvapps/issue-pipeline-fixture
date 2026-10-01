@@ -28,4 +28,37 @@ describe('cart', () => {
   test('formats cents', () => {
     expect(formatCents(5400)).toBe('$54.00')
   })
+
+  test('a coupon discounts the item subtotal only, never shipping', () => {
+    const t = cartTotals([mug, poster], 'SAVE10')
+    expect(t).toEqual({ subtotalCents: 4900, shippingCents: 500, discountCents: 490, totalCents: 4910 })
+    // Regression: the discount base must be the items alone, not items + shipping.
+    expect(t.discountCents).toBe(Math.round((t.subtotalCents * 10) / 100))
+  })
+
+  test('the same rule holds for other coupons', () => {
+    expect(cartTotals([mug, poster], 'SAVE25')).toEqual({
+      subtotalCents: 4900,
+      shippingCents: 500,
+      discountCents: 1225,
+      totalCents: 4175,
+    })
+  })
+
+  test('shipping is charged in full alongside a coupon', () => {
+    expect(cartTotals([mug, poster], 'SAVE10').shippingCents).toBe(shipping(4900))
+  })
+
+  test('coupon matching ignores case and surrounding whitespace', () => {
+    expect(cartTotals([mug, poster], '  save10 ').totalCents).toBe(4910)
+  })
+
+  test('an unknown coupon leaves the totals untouched', () => {
+    expect(cartTotals([mug, poster], 'NOPE')).toEqual({
+      subtotalCents: 4900,
+      shippingCents: 500,
+      discountCents: 0,
+      totalCents: 5400,
+    })
+  })
 })
