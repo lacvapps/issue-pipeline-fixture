@@ -25,6 +25,26 @@ describe('cart', () => {
     expect(cartTotals([big], 'SAVE10').totalCents).toBe(9000)
   })
 
+  test('a coupon discounts the items subtotal, never shipping', () => {
+    expect(cartTotals([mug, poster], 'SAVE10')).toEqual({
+      subtotalCents: 4900,
+      shippingCents: 500,
+      discountCents: 490,
+      totalCents: 4910,
+    })
+  })
+
+  test('the discount does not move when shipping moves', () => {
+    const shipped = cartTotals([mug, poster], 'SAVE10') // $49.00 subtotal -> pays $5.00 shipping
+    const free = cartTotals([{ name: 'Chair', priceCents: 10000, quantity: 1 }], 'SAVE10') // $100.00 -> ships free
+    expect(shipped.shippingCents).toBe(500)
+    expect(free.shippingCents).toBe(0)
+    expect(shipped.discountCents).toBe(490)
+    expect(free.discountCents).toBe(1000)
+    expect(shipped.totalCents).toBe(4910)
+    expect(free.totalCents).toBe(9000)
+  })
+
   test('formats cents', () => {
     expect(formatCents(5400)).toBe('$54.00')
   })
