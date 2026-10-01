@@ -28,4 +28,30 @@ describe('cart', () => {
   test('formats cents', () => {
     expect(formatCents(5400)).toBe('$54.00')
   })
+
+  test('a coupon on an order that pays shipping discounts the items only', () => {
+    expect(cartTotals([mug, poster], 'SAVE10')).toEqual({
+      subtotalCents: 4900,
+      shippingCents: 500,
+      discountCents: 490,
+      totalCents: 4910,
+    })
+  })
+
+  test('a coupon never changes shipping', () => {
+    const withCoupon = cartTotals([mug, poster], 'SAVE10')
+    const withoutCoupon = cartTotals([mug, poster])
+    expect(withCoupon.shippingCents).toBe(withoutCoupon.shippingCents)
+    expect(withCoupon.shippingCents).toBe(500)
+    expect(withoutCoupon.totalCents).toBe(5400)
+  })
+
+  test('SAVE25 also discounts the items only', () => {
+    expect(cartTotals([mug, poster], 'SAVE25')).toEqual({
+      subtotalCents: 4900,
+      shippingCents: 500,
+      discountCents: 1225,
+      totalCents: 4175,
+    })
+  })
 })
