@@ -25,6 +25,25 @@ describe('cart', () => {
     expect(cartTotals([big], 'SAVE10').totalCents).toBe(9000)
   })
 
+  test('a coupon discounts the items subtotal, never the shipping', () => {
+    const t = cartTotals([mug, poster], 'SAVE10')
+    expect(t).toEqual({ subtotalCents: 4900, shippingCents: 500, discountCents: 490, totalCents: 4910 })
+  })
+
+  test('shippingCents is untouched by a coupon', () => {
+    expect(cartTotals([mug, poster], 'SAVE10').shippingCents).toBe(500)
+    expect(cartTotals([mug, poster]).totalCents).toBe(5400)
+  })
+
+  test('SAVE25 is also discounted off the items only', () => {
+    expect(cartTotals([mug, poster], 'SAVE25')).toEqual({
+      subtotalCents: 4900,
+      shippingCents: 500,
+      discountCents: 1225,
+      totalCents: 4175,
+    })
+  })
+
   test('formats cents', () => {
     expect(formatCents(5400)).toBe('$54.00')
   })
