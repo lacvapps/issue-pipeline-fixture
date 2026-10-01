@@ -35,7 +35,7 @@ export function cartTotals(items: CartItem[], coupon?: string): Totals {
   const subtotalCents = subtotal(items)
   const shippingCents = shipping(subtotalCents)
   const percent = coupon ? (COUPONS[coupon.trim().toUpperCase()] ?? 0) : 0
-  const discountCents = Math.round(((subtotalCents + shippingCents) * percent) / 100)
+  const discountCents = Math.round((subtotalCents * percent) / 100)
   return {
     subtotalCents,
     shippingCents,
