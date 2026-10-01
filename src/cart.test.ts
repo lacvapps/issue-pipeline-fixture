@@ -25,6 +25,33 @@ describe('cart', () => {
     expect(cartTotals([big], 'SAVE10').totalCents).toBe(9000)
   })
 
+  test('a coupon discounts the items subtotal, never the shipping', () => {
+    expect(cartTotals([mug, poster], 'SAVE10')).toEqual({
+      subtotalCents: 4900,
+      shippingCents: 500,
+      discountCents: 490,
+      totalCents: 4910,
+    })
+  })
+
+  test('the discount is sized from the subtotal alone, so shipping is untouched', () => {
+    const big = { name: 'Chair', priceCents: 10000, quantity: 1 }
+    const free = cartTotals([big], 'SAVE10')
+    expect(free.shippingCents).toBe(0)
+    expect(free.discountCents).toBe(1000)
+    expect(free.totalCents).toBe(9000)
+
+    const payable = cartTotals([mug, poster], 'SAVE10')
+    expect(payable.shippingCents).toBe(500)
+    expect(payable.discountCents).toBe(490)
+  })
+
+  test('each coupon percent applies to the items only', () => {
+    expect(cartTotals([mug, poster], 'SAVE25').discountCents).toBe(1225)
+    expect(cartTotals([mug, poster], 'SAVE25').totalCents).toBe(4175)
+    expect(cartTotals([mug, poster], 'save10').discountCents).toBe(490)
+  })
+
   test('formats cents', () => {
     expect(formatCents(5400)).toBe('$54.00')
   })
